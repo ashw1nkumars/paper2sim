@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { artifactUrl, type Job, type JobStatus } from "../api";
+import { artifactUrl, type Job, type JobStatus } from "../lib/api";
 import Scene3D from "./Scene3D";
 
 const STAGES: { key: JobStatus; label: string }[] = [

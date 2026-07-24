@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { getJob, listJobs, type Job } from "./api";
+import { getJob, listJobs, type Job } from "./lib/api";
 import JobDetail from "./components/JobDetail";
 import JobList from "./components/JobList";
 import SubmitForm from "./components/SubmitForm";

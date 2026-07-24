@@ -1,4 +1,4 @@
-import type { Job } from "../api";
+import type { Job } from "../lib/api";
 
 export default function JobList({
   jobs,

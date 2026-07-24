@@ -23,3 +23,6 @@ backend/data/
 
 # Playwright scratch
 .playwright-mcp/
+
+# Git worktrees
+.workspaces/

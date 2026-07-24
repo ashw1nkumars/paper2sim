@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { submitPaper } from "../api";
+import { submitPaper } from "../lib/api";
 
 type Mode = "arxiv" | "text" | "pdf";
 

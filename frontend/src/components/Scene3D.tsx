@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Line, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
-import type { Scene3D as SceneData, Scene3DObject } from "../api";
+import type { Scene3D as SceneData, Scene3DObject } from "../lib/api";
 
 // Guard against invisible geometry: a near-black color on the dark background is
 // unreadable, so fall back to a bright accent when the requested color is too dark.
