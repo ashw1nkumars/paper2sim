@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+# Env / secrets
+.env
+
+# Runtime data (uploads + generated artifacts)
+/data/
+backend/data/
+
+# OS
+.DS_Store
+
+# Playwright scratch
+.playwright-mcp/
