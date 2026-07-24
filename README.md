@@ -2,7 +2,7 @@
 
 # ∮ paper2sim
 
-### Give it a math or CS paper. It writes a simulation to test the paper's claim - and runs it.
+### Give it a math, CS, or physics paper. It writes a simulation to test the paper's claim - and runs it.
 
 [![CI](https://github.com/ashw1nkumars/paper2sim/actions/workflows/ci.yml/badge.svg)](https://github.com/ashw1nkumars/paper2sim/actions/workflows/ci.yml)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
@@ -60,6 +60,8 @@ Papers make claims. paper2sim tries to **empirically back one up** by building t
 3. **Generate** a self-contained Python simulation targeting that plan.
 4. **Execute** the code in a resource-limited sandbox that produces figures / animations and a structured result - repairing and retrying if the code crashes.
 5. **Summarize** the outcome in plain language: does the simulation support the claim?
+
+It works across **mathematics, computer science, and physics**, and picks an approach that fits the field: Monte Carlo / convergence studies and `sympy` for math, algorithm implementations with measured complexity for CS, and numerical integration of equations of motion (`scipy.integrate`), dynamical / statistical / quantum systems, and conservation-law checks for physics.
 
 Here is an animation the pipeline generated and ran, entirely on its own - a Monte Carlo estimate of π converging at the theoretical O(1/√N) rate:
 

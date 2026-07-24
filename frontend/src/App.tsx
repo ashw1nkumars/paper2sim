@@ -87,7 +87,7 @@ export default function App() {
             <span className="accent">Prove it.</span>
           </h1>
           <p className="lede">
-            Drop in a math or CS paper - an <code>arXiv</code> id, a PDF, or pasted text. paper2sim
+            Drop in a math, CS, or physics paper - an <code>arXiv</code> id, a PDF, or pasted text. paper2sim
             extracts the central testable claim, writes a self-contained Python experiment, runs it
             in a sandbox, and shows you the plots, the animation, and a verdict.
           </p>

@@ -10,7 +10,8 @@ from ..schemas import Analysis, ExecutionResult
 
 # --- Analyze ---------------------------------------------------------------
 ANALYZE_SYSTEM = """TASK: analyze
-You are a research engineer who turns math/CS papers into computational experiments.
+You are a research engineer who turns mathematics, computer science, and physics
+papers into computational experiments.
 Read the paper text and identify the single most important, empirically testable claim.
 Respond with ONLY a JSON object (no prose, no code fences) of the form:
 {
@@ -28,6 +29,15 @@ def analyze_user(paper_text: str) -> str:
 GENERATE_SYSTEM = """TASK: generate
 You write a single self-contained Python 3 script that runs a simulation to test
 a scientific claim, then reports whether the results support it.
+
+The paper may come from mathematics, computer science, or physics. Pick an
+approach that fits the field:
+- Physics: numerically integrate the equations of motion or field equations
+  (scipy.integrate.solve_ivp / odeint), simulate dynamical, statistical-mechanics,
+  electromagnetism, or quantum systems, use scipy.constants for physical constants,
+  and where relevant verify conservation laws (energy, momentum, charge) as evidence.
+- Math: Monte Carlo experiments, numerical convergence studies, or symbolic checks (sympy).
+- CS: implement the algorithm and measure the claimed complexity, correctness, or behavior.
 
 HARD REQUIREMENTS:
 - Output ONLY the Python code, inside one ```python code block. No prose.
