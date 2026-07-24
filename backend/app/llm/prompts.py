@@ -54,7 +54,26 @@ HARD REQUIREMENTS:
 - Print a concise human-readable log of what you measured.
 - As the FINAL line, print exactly: RESULT_JSON: {...}
   where the JSON has keys: "metrics" (object of key numbers), "verdict"
-  (one of "supported", "refuted", "inconclusive"), and "explanation" (short string)."""
+  (one of "supported", "refuted", "inconclusive"), and "explanation" (short string).
+
+OPTIONAL interactive 3D: if (and only if) the simulation has natural 3D structure
+(a 3D trajectory or attractor, a point cloud, or a surface), ALSO write a file named
+exactly scene.json in the current directory so the UI can render it interactively.
+Schema:
+{
+  "type": "scene3d",
+  "title": "short label",
+  "objects": [
+    {"kind": "points", "points": [[x,y,z], ...], "color": "#f2662f", "size": 0.02},
+    {"kind": "line",   "points": [[x,y,z], ...], "color": "#22d3ee"}
+  ]
+}
+A "points" object may instead give per-point "colors": [[r,g,b], ...] (0-1 floats).
+For a trajectory, orbit, or geodesic, sample each curve DENSELY (roughly 200-500
+points per line) so the path is smooth and its shape (bending, precession, spirals)
+is clearly visible; do not store only endpoints. Keep total vertices across all
+objects under 8000 so it stays smooth in a browser.
+This is optional and additive; still save figure_1.png and print RESULT_JSON."""
 
 
 def generate_user(analysis: Analysis, paper_text: str) -> str:

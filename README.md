@@ -27,6 +27,7 @@
 
 - [What it does](#what-it-does)
 - [Real runs across math, CS, and physics](#real-runs-across-math-cs-and-physics)
+- [Interactive 3D](#interactive-3d)
 - [Quickstart](#quickstart)
 - [How it works](#how-it-works)
 - [Architecture](#architecture)
@@ -109,6 +110,32 @@ Figures the pipeline generated and ran entirely on its own:
 </details>
 
 > These are honest, unedited results. The verdict reflects what a short, abstract-only simulation can actually establish. The physics run, for instance, measured a positive maximal Lyapunov exponent (~1.34) with gravity and ~0 without, matching the paper, yet self-reported `inconclusive` because a single run cannot cover every initial condition.
+
+---
+
+## Interactive 3D
+
+When a simulation has natural 3D structure, paper2sim renders it as a **live scene** you can **drag to rotate, scroll to zoom, and right-drag to pan**. The renderer is a fixed [three.js viewer](frontend/src/components/Scene3D.tsx) in the frontend (**no LLM**): the simulation just writes a small `scene.json` (points, lines, or trajectories) and the viewer does the rest.
+
+Below is the real run of **"Black hole shadow and wandering null geodesics"** (arXiv [2107.06551](https://arxiv.org/abs/2107.06551)): the pipeline integrated photon geodesics winding around a Schwarzschild black hole and rendered them interactively.
+
+<div align="center">
+  <img src="docs/3d_blackhole.gif" alt="Interactive 3D: wandering null geodesics around a black hole" width="740" />
+</div>
+
+The offline **mock** provider also emits a 3D scene (a Monte-Carlo point cloud of the unit sphere), so `docker compose up` gives you an interactive 3D result with **no API key and no LLM at all**.
+
+```json
+// scene.json contract (optional artifact any run may emit)
+{
+  "type": "scene3d",
+  "title": "Wandering null geodesics",
+  "objects": [
+    { "kind": "line",   "points": [[x, y, z], ...], "color": "#22d3ee" },
+    { "kind": "points", "points": [[x, y, z], ...], "colors": [[r, g, b], ...], "size": 0.02 }
+  ]
+}
+```
 
 ---
 

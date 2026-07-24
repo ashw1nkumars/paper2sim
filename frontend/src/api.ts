@@ -24,9 +24,24 @@ export interface ExecutionResult {
   stderr: string;
   duration_seconds: number;
   artifacts: string[];
+  scene: string | null;
   result_json: Record<string, unknown> | null;
   attempt: number;
   timed_out: boolean;
+}
+
+export interface Scene3D {
+  type: string;
+  title?: string;
+  objects: Scene3DObject[];
+}
+
+export interface Scene3DObject {
+  kind: "points" | "line";
+  points: [number, number, number][];
+  color?: string;
+  colors?: [number, number, number][];
+  size?: number;
 }
 
 export interface Job {

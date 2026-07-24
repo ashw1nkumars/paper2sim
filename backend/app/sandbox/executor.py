@@ -115,12 +115,17 @@ def run_code(job_id: str, code: str, attempt: int = 1) -> ExecutionResult:
         for path in sorted(run_dir.glob(pattern)):
             artifacts.append(str(path.relative_to(base)))
 
+    # An optional interactive 3D scene the script may have written.
+    scene_file = run_dir / "scene.json"
+    scene = str(scene_file.relative_to(base)) if scene_file.is_file() else None
+
     return ExecutionResult(
         returncode=returncode,
         stdout=stdout[-_MAX_CAPTURE:],
         stderr=stderr[-_MAX_CAPTURE:],
         duration_seconds=round(duration, 3),
         artifacts=artifacts,
+        scene=scene,
         result_json=_parse_result_json(stdout),
         attempt=attempt,
         timed_out=timed_out,

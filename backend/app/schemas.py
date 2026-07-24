@@ -38,7 +38,8 @@ class ExecutionResult(BaseModel):
     stdout: str = ""
     stderr: str = ""
     duration_seconds: float = 0.0
-    artifacts: list[str] = Field(default_factory=list)  # paths relative to artifacts_dir
+    artifacts: list[str] = Field(default_factory=list)  # image paths relative to artifacts_dir
+    scene: str | None = None  # path to an interactive 3D scene.json, if the run produced one
     result_json: dict[str, Any] | None = None
     attempt: int = 1
     timed_out: bool = False

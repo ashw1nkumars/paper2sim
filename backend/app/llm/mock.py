@@ -16,7 +16,7 @@ _ANALYSIS_JSON = """{
 }"""
 
 # A self-contained script that only uses the allowlisted libraries and always
-# produces figure_1.png, figure_2.gif, and a final RESULT_JSON line.
+# produces figure_1.png, figure_2.gif, scene.json (interactive 3D), and RESULT_JSON.
 _SIMULATION_CODE = '''import json
 
 import numpy as np
@@ -27,29 +27,46 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, PillowWriter
 
 rng = np.random.default_rng(0)
-N = 20000
-pts = rng.random((N, 2))
-inside = (pts[:, 0] ** 2 + pts[:, 1] ** 2) <= 1.0
-pi_estimate = 4.0 * inside.mean()
+N = 40000
+pts = rng.random((N, 3))
+inside = (pts ** 2).sum(axis=1) <= 1.0
+# The unit-cube octant (volume 1) contains the unit-sphere octant (volume pi/6).
+pi_estimate = 6.0 * inside.mean()
 
-# --- Figure 1: the "dartboard" view -----------------------------------------
-fig1, ax1 = plt.subplots(figsize=(6, 6))
-sample, sin = pts[:4000], inside[:4000]
-ax1.scatter(sample[sin, 0], sample[sin, 1], s=3, color="#2563eb", alpha=0.6, label="inside")
-ax1.scatter(sample[~sin, 0], sample[~sin, 1], s=3, color="#ef4444", alpha=0.6, label="outside")
-theta = np.linspace(0, np.pi / 2, 200)
-ax1.plot(np.cos(theta), np.sin(theta), color="black", lw=2)
-ax1.set_aspect("equal")
-ax1.set_xlim(0, 1)
-ax1.set_ylim(0, 1)
-ax1.set_title("Monte Carlo estimate of pi (points in the quarter circle)")
-ax1.legend(loc="upper right")
+# --- Interactive 3D scene: the Monte Carlo point cloud ----------------------
+scene_pts = pts[:4000]
+scene_inside = inside[:4000]
+inside_rgb, outside_rgb = [0.949, 0.4, 0.184], [0.133, 0.827, 0.933]
+colors = np.where(scene_inside[:, None], inside_rgb, outside_rgb)
+scene = {
+    "type": "scene3d",
+    "title": "Monte Carlo points: inside vs outside the unit sphere",
+    "objects": [
+        {
+            "kind": "points",
+            "points": scene_pts.round(4).tolist(),
+            "colors": colors.round(3).tolist(),
+            "size": 0.02,
+        }
+    ],
+}
+with open("scene.json", "w") as fh:
+    json.dump(scene, fh)
+
+# --- Figure 1: 3D scatter (static) ------------------------------------------
+fig1 = plt.figure(figsize=(6, 6))
+ax1 = fig1.add_subplot(111, projection="3d")
+smp, sin = pts[:3000], inside[:3000]
+ax1.scatter(smp[sin, 0], smp[sin, 1], smp[sin, 2], s=4, color="#f2662f", alpha=0.5, label="inside")
+ax1.scatter(smp[~sin, 0], smp[~sin, 1], smp[~sin, 2], s=4, color="#22d3ee", alpha=0.25, label="outside")
+ax1.set_title("Monte Carlo estimate of pi (3D unit sphere)")
+ax1.legend(loc="upper left")
 fig1.savefig("figure_1.png", dpi=120, bbox_inches="tight")
 plt.close(fig1)
 
 # --- Convergence data -------------------------------------------------------
 ns = np.unique(np.logspace(1, np.log10(N), 60).astype(int))
-running = np.array([4.0 * inside[:n].mean() for n in ns])
+running = np.array([6.0 * inside[:n].mean() for n in ns])
 error = np.abs(running - np.pi)
 
 # --- Figure 2: animated convergence to pi -----------------------------------
@@ -93,18 +110,19 @@ print("RESULT_JSON:", json.dumps({
         "error_decay_exponent": round(slope, 3),
     },
     "verdict": verdict,
-    "explanation": "Monte Carlo integration converges to pi with error shrinking at the theoretical O(1/sqrt(N)) rate.",
+    "explanation": "Monte Carlo integration in 3D converges to pi with error shrinking at the theoretical O(1/sqrt(N)) rate.",
 }))
 '''
 
 _SUMMARY = (
-    "The simulation reconstructs the paper's claim from scratch: it throws tens of "
-    "thousands of random darts at a unit square and counts how many land inside the "
-    "quarter circle. That fraction, scaled by four, estimates pi to within a few "
-    "thousandths, and the animated convergence plot shows the running estimate homing "
-    "in on the true value as more samples arrive. Fitting the shrinking error on a "
-    "log-log scale recovers a slope near -0.5, exactly the O(1/sqrt(N)) rate the claim "
-    "predicts. The evidence supports the claim."
+    "The simulation reconstructs the paper's claim from scratch: it scatters tens of "
+    "thousands of random points inside a unit cube and counts how many fall within the "
+    "unit sphere. That fraction, scaled to the sphere's volume, estimates pi to within a "
+    "few thousandths, and the animated convergence plot shows the running estimate homing "
+    "in on the true value as more samples arrive. You can rotate and zoom the 3D point "
+    "cloud to see the sphere emerge. Fitting the shrinking error on a log-log scale "
+    "recovers a slope near -0.5, exactly the O(1/sqrt(N)) rate the claim predicts. The "
+    "evidence supports the claim."
 )
 
 

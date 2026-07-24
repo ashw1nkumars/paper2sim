@@ -46,5 +46,6 @@ def test_pipeline_end_to_end_with_mock(monkeypatch):
     assert final.code
     assert final.execution and final.execution.returncode == 0
     assert any(a.endswith(".gif") for a in final.execution.artifacts)
+    assert final.execution.scene and final.execution.scene.endswith("scene.json")
     assert final.verdict == "supported"
     assert final.summary

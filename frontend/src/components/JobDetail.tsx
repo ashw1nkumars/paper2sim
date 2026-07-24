@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { artifactUrl, type Job, type JobStatus } from "../api";
+import Scene3D from "./Scene3D";
 
 const STAGES: { key: JobStatus; label: string }[] = [
   { key: "ingesting", label: "Ingest" },
@@ -99,6 +100,13 @@ export default function JobDetail({ job }: { job: Job | null }) {
               <p>{job.analysis.simulation_plan}</p>
             </>
           )}
+        </section>
+      )}
+
+      {job.execution?.scene && (
+        <section className="artifacts">
+          <h3>Interactive 3D</h3>
+          <Scene3D url={artifactUrl(job.execution.scene)} />
         </section>
       )}
 
