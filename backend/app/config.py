@@ -14,10 +14,19 @@ class Settings(BaseSettings):
     celery_result_backend: str = ""
 
     # --- LLM ----------------------------------------------------------------
-    # "auto" -> anthropic if a key is present, else the deterministic mock.
+    # "auto" -> anthropic if its key is present, else groq if its key is present,
+    # else the deterministic mock. Force one with "anthropic" | "groq" | "mock".
     llm_provider: str = "auto"
     anthropic_api_key: str = ""
     anthropic_model: str = "claude-sonnet-5"
+    groq_api_key: str = ""
+    groq_model: str = "llama-3.3-70b-versatile"
+    cerebras_api_key: str = ""
+    cerebras_model: str = "gpt-oss-120b"
+    google_ai_studio_api_key: str = ""
+    google_model: str = "gemini-3.6-flash"
+    openrouter_api_key: str = ""
+    openrouter_model: str = "deepseek/deepseek-chat"
     llm_max_tokens: int = 8000
     max_repair_attempts: int = 3
 

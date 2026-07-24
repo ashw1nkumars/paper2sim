@@ -47,8 +47,9 @@ HARD REQUIREMENTS:
   working directory. Do NOT call os.system, subprocess, eval, or exec.
 - Set matplotlib to the non-interactive Agg backend and NEVER call plt.show().
 - Seed all randomness (e.g. numpy.random.default_rng(0)) so runs are reproducible.
-- Save every figure into the current directory as figure_1.png, figure_2.png, ...
-  For an animation, save a GIF (figure_N.gif) using matplotlib PillowWriter or imageio.
+- You MUST save at least one figure into the current directory as figure_1.png
+  (figure_2.png, ... for more); a run that saves no figure is a failure. For an
+  animation, save a GIF (figure_N.gif) using matplotlib PillowWriter or imageio.
 - Keep total runtime well under 45 seconds and memory modest.
 - Print a concise human-readable log of what you measured.
 - As the FINAL line, print exactly: RESULT_JSON: {...}

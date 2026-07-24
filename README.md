@@ -26,6 +26,7 @@
 ## Table of contents
 
 - [What it does](#what-it-does)
+- [Real runs across math, CS, and physics](#real-runs-across-math-cs-and-physics)
 - [Quickstart](#quickstart)
 - [How it works](#how-it-works)
 - [Architecture](#architecture)
@@ -70,6 +71,44 @@ Here is an animation the pipeline generated and ran, entirely on its own - a Mon
 </div>
 
 > **No API key? It still works.** With no key configured, paper2sim falls back to a deterministic **mock provider** that runs the full pipeline on a classic example (Monte Carlo π + the law of large numbers), so `docker compose up` gives you a real, rendered result out of the box. This is also what powers the CI tests.
+
+---
+
+## Real runs across math, CS, and physics
+
+Three real runs, one per domain, driven live through the UI using **free** LLM providers ([Google Gemini 3.6 Flash](backend/app/llm/google.py) and [OpenRouter / DeepSeek](backend/app/llm/openrouter.py)). Each paper's central claim was extracted from its arXiv abstract, turned into a Python simulation, executed in the sandbox, and rendered with a verdict.
+
+| Domain | Paper | Provider · model | Verdict |
+|--------|-------|------------------|---------|
+| ⚛️ Physics | [Dynamics and non-integrability of the double spring pendulum](https://arxiv.org/abs/2406.02200) (`nlin.CD`) | Google · gemini-3.6-flash | inconclusive |
+| ∑ Math | [The semicircle law for matrices with ergodic entries](https://arxiv.org/abs/1904.00397) (`math.PR`) | Google · gemini-3.6-flash | **supported** |
+| ⌨️ CS | [New cardinality estimation algorithms for HyperLogLog sketches](https://arxiv.org/abs/1702.01284) (`cs.DS`) | OpenRouter · deepseek-chat | inconclusive |
+
+Figures the pipeline generated and ran entirely on its own:
+
+<table>
+<tr>
+<td width="34%" align="center"><b>Physics</b><br/><sub>Lyapunov / energy / momentum</sub></td>
+<td width="33%" align="center"><b>Math</b><br/><sub>spectral density vs semicircle</sub></td>
+<td width="33%" align="center"><b>CS</b><br/><sub>cardinality-estimate error</sub></td>
+</tr>
+<tr>
+<td><img src="docs/runs/physics_analysis.png" alt="Physics figure" /></td>
+<td><img src="docs/runs/math_spectral_density.png" alt="Math figure" /></td>
+<td><img src="docs/runs/cs_cardinality.png" alt="CS figure" /></td>
+</tr>
+</table>
+
+<details>
+<summary><b>Full run screenshots</b> (claim, plan, figures, and conclusion for each)</summary>
+
+![Physics run](docs/runs/ui_physics.jpeg)
+![Math run](docs/runs/ui_math.jpeg)
+![CS run](docs/runs/ui_cs.jpeg)
+
+</details>
+
+> These are honest, unedited results. The verdict reflects what a short, abstract-only simulation can actually establish. The physics run, for instance, measured a positive maximal Lyapunov exponent (~1.34) with gravity and ~0 without, matching the paper, yet self-reported `inconclusive` because a single run cannot cover every initial condition.
 
 ---
 
@@ -229,9 +268,15 @@ class LLMProvider(Protocol):
 
 [`get_provider()`](backend/app/llm/base.py) selects the implementation based on `LLM_PROVIDER`:
 
-- `auto` (default) → **Anthropic** if `ANTHROPIC_API_KEY` is set, otherwise **mock**;
-- `anthropic` → force [`AnthropicProvider`](backend/app/llm/anthropic.py) (uses the official `anthropic` SDK, model from `ANTHROPIC_MODEL`);
-- `mock` → force [`MockProvider`](backend/app/llm/mock.py).
+- `auto` (default) → first configured of **Anthropic** → **Groq** → **Cerebras** → **Google** → **OpenRouter**, else the **mock**;
+- `anthropic` → [`AnthropicProvider`](backend/app/llm/anthropic.py) (official `anthropic` SDK, `ANTHROPIC_MODEL`);
+- `groq` → [`GroqProvider`](backend/app/llm/groq.py) (fast open models, `GROQ_MODEL`);
+- `cerebras` → [`CerebrasProvider`](backend/app/llm/cerebras.py) (fast open models, `CEREBRAS_MODEL`);
+- `google` → [`GoogleProvider`](backend/app/llm/google.py) (Gemini via its OpenAI-compatible endpoint, `GOOGLE_MODEL`);
+- `openrouter` → [`OpenRouterProvider`](backend/app/llm/openrouter.py) (many models via one API, `OPENROUTER_MODEL`);
+- `mock` → [`MockProvider`](backend/app/llm/mock.py).
+
+Groq, Cerebras, Google, and OpenRouter all share one tiny [OpenAI-compatible client](backend/app/llm/openai_compat.py) (base URL + key + model, with 429 backoff), so adding another such provider is a few lines.
 
 The **mock** provider keys off a `TASK:` line embedded at the top of each system prompt and returns a fixed, mutually-consistent set of responses (analysis, a guaranteed-to-run simulation, and a summary) built around Monte Carlo π. Real models ignore that line. This makes the app runnable offline and makes the pipeline tests fully deterministic.
 
@@ -308,9 +353,17 @@ All settings have working defaults ([`app/config.py`](backend/app/config.py); se
 |----------|---------|---------|
 | `REDIS_URL` | `redis://redis:6379/0` | Redis connection (broker, backend, store, cache, limiter). |
 | `CELERY_BROKER_URL` / `CELERY_RESULT_BACKEND` | *(= `REDIS_URL`)* | Override broker/backend independently. |
-| `LLM_PROVIDER` | `auto` | `auto` \| `anthropic` \| `mock`. |
+| `LLM_PROVIDER` | `auto` | `auto` \| `anthropic` \| `groq` \| `cerebras` \| `google` \| `openrouter` \| `mock`. |
 | `ANTHROPIC_API_KEY` | *(empty)* | Enables the Claude provider. |
-| `ANTHROPIC_MODEL` | `claude-sonnet-5` | Model used for all stages. |
+| `ANTHROPIC_MODEL` | `claude-sonnet-5` | Claude model used for all stages. |
+| `GROQ_API_KEY` | *(empty)* | Enables the Groq provider. |
+| `GROQ_MODEL` | `llama-3.3-70b-versatile` | Groq model used for all stages. |
+| `CEREBRAS_API_KEY` | *(empty)* | Enables the Cerebras provider. |
+| `CEREBRAS_MODEL` | `gpt-oss-120b` | Cerebras model used for all stages. |
+| `GOOGLE_AI_STUDIO_API_KEY` | *(empty)* | Enables the Google Gemini provider. |
+| `GOOGLE_MODEL` | `gemini-3.6-flash` | Gemini model used for all stages. |
+| `OPENROUTER_API_KEY` | *(empty)* | Enables the OpenRouter provider. |
+| `OPENROUTER_MODEL` | `deepseek/deepseek-chat` | OpenRouter model used for all stages. |
 | `LLM_MAX_TOKENS` | `8000` | Max output tokens per LLM call. |
 | `MAX_REPAIR_ATTEMPTS` | `3` | Times a failing script is repaired + retried. |
 | `SANDBOX_TIMEOUT_SECONDS` | `60` | CPU + wall-clock limit per script. |

@@ -23,15 +23,47 @@ def get_provider() -> LLMProvider:
     settings = get_settings()
     choice = settings.llm_provider.lower()
 
-    if choice == "mock":
-        from .mock import MockProvider
-
-        return MockProvider()
-
-    if choice == "anthropic" or (choice == "auto" and settings.anthropic_api_key):
+    if choice == "anthropic":
         from .anthropic import AnthropicProvider
 
         return AnthropicProvider()
+    if choice == "groq":
+        from .groq import GroqProvider
+
+        return GroqProvider()
+    if choice == "cerebras":
+        from .cerebras import CerebrasProvider
+
+        return CerebrasProvider()
+    if choice == "google":
+        from .google import GoogleProvider
+
+        return GoogleProvider()
+    if choice == "openrouter":
+        from .openrouter import OpenRouterProvider
+
+        return OpenRouterProvider()
+    if choice == "auto":
+        if settings.anthropic_api_key:
+            from .anthropic import AnthropicProvider
+
+            return AnthropicProvider()
+        if settings.groq_api_key:
+            from .groq import GroqProvider
+
+            return GroqProvider()
+        if settings.cerebras_api_key:
+            from .cerebras import CerebrasProvider
+
+            return CerebrasProvider()
+        if settings.google_ai_studio_api_key:
+            from .google import GoogleProvider
+
+            return GoogleProvider()
+        if settings.openrouter_api_key:
+            from .openrouter import OpenRouterProvider
+
+            return OpenRouterProvider()
 
     from .mock import MockProvider
 

@@ -21,13 +21,20 @@ from ..schemas import Analysis, ExecutionResult, JobStatus
 
 _settings = get_settings()
 
-_CODE_FENCE = re.compile(r"```(?:python)?\s*(.*?)```", re.DOTALL)
+_CODE_FENCE = re.compile(r"```(?:python)?\s*\n?(.*?)```", re.DOTALL)
+_CODE_FENCE_OPEN = re.compile(r"```(?:python)?\s*\n(.*)", re.DOTALL)
 _JSON_OBJECT = re.compile(r"\{.*\}", re.DOTALL)
 
 
 def extract_code(text: str) -> str:
     match = _CODE_FENCE.search(text)
-    return (match.group(1) if match else text).strip()
+    if match:
+        return match.group(1).strip()
+    # Tolerate a truncated response whose closing fence is missing.
+    match = _CODE_FENCE_OPEN.search(text)
+    if match:
+        return match.group(1).strip()
+    return text.strip()
 
 
 def parse_analysis(text: str) -> Analysis:
@@ -89,6 +96,8 @@ def run_pipeline(self, job_id: str) -> str:  # noqa: ARG001 (self required by bi
         store.save_job(job)
 
         # 4. Execute, with a repair loop ------------------------------------
+        # A run only counts as successful if it exits cleanly AND produced at
+        # least one figure; a clean run with no figures is repaired too.
         execution: ExecutionResult | None = None
         for attempt in range(1, _settings.max_repair_attempts + 1):
             store.set_status(job, JobStatus.executing if attempt == 1 else JobStatus.repairing)
@@ -96,13 +105,31 @@ def run_pipeline(self, job_id: str) -> str:  # noqa: ARG001 (self required by bi
             job.code = code
             job.execution = execution
             store.save_job(job)
-            if execution.returncode == 0:
+            if execution.returncode == 0 and execution.artifacts:
                 break
             if attempt < _settings.max_repair_attempts:
-                code = extract_code(
-                    provider.complete(
-                        prompts.REPAIR_SYSTEM, prompts.repair_user(code, execution.stderr)
+                if execution.returncode != 0:
+                    feedback = execution.stderr.strip()
+                    if not feedback:
+                        # A resource-limit kill (e.g. SIGXCPU, rc -24) leaves no
+                        # traceback, so tell the model to make the code faster/lighter.
+                        feedback = (
+                            f"The script was killed (exit code {execution.returncode}) with no "
+                            "output, almost certainly for exceeding the CPU-time or memory limit. "
+                            "Make it dramatically faster and lighter: shrink sample sizes, replace "
+                            "Python loops with vectorized numpy, avoid O(n^2) work, and keep total "
+                            "runtime well under 40 seconds. Still save figure_1.png and print the "
+                            "final RESULT_JSON line."
+                        )
+                else:
+                    feedback = (
+                        "The script exited successfully but saved no figures. You MUST "
+                        "save at least one figure to the current directory as figure_1.png "
+                        "(use matplotlib with the Agg backend), and still print the final "
+                        "RESULT_JSON line."
                     )
+                code = extract_code(
+                    provider.complete(prompts.REPAIR_SYSTEM, prompts.repair_user(code, feedback))
                 )
 
         # 5. Summarize -------------------------------------------------------
