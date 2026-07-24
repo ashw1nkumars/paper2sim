@@ -14,7 +14,7 @@ import httpx
 
 from .. import store
 
-_ARXIV_API = "http://export.arxiv.org/api/query"
+_ARXIV_API = "https://export.arxiv.org/api/query"
 _ATOM = {"a": "http://www.w3.org/2005/Atom"}
 _ID_RE = re.compile(r"(\d{4}\.\d{4,5})(v\d+)?")
 
@@ -39,7 +39,13 @@ def fetch_text(ref: str) -> str:
     if cached:
         return cached
 
-    resp = httpx.get(_ARXIV_API, params={"id_list": arxiv_id}, timeout=30.0)
+    resp = httpx.get(
+        _ARXIV_API,
+        params={"id_list": arxiv_id},
+        timeout=30.0,
+        follow_redirects=True,
+        headers={"User-Agent": "paper2sim/0.1 (https://github.com/ashw1nkumars/paper2sim)"},
+    )
     resp.raise_for_status()
 
     root = ET.fromstring(resp.text)
