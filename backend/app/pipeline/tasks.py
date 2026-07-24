@@ -123,7 +123,7 @@ def run_pipeline(self, job_id: str) -> str:  # noqa: ARG001 (self required by bi
         store.set_status(job, final)
         return final.value
 
-    except Exception as exc:  # noqa: BLE001 — record any failure on the job
+    except Exception as exc:  # noqa: BLE001 - record any failure on the job
         job.error = f"{type(exc).__name__}: {exc}"
         job.verdict = "error"
         store.set_status(job, JobStatus.failed)
