@@ -2,9 +2,10 @@
 
 from fastapi.testclient import TestClient
 
-from app import store as store_mod
-from app.celery_app import celery_app
-from app.main import app, rate_limit
+import store as store_mod
+from api.deps import rate_limit
+from main import app
+from worker import celery_app
 
 
 def _client(monkeypatch) -> tuple[TestClient, dict]:

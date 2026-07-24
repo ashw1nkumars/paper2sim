@@ -2,7 +2,7 @@
 
 from celery import Celery
 
-from .config import get_settings
+from core.config import get_settings
 
 _settings = get_settings()
 
@@ -21,5 +21,5 @@ celery_app.conf.update(
     task_time_limit=900,  # hard ceiling per job (s); the sandbox has its own limit
     worker_prefetch_multiplier=1,
     # Tasks live here; imported lazily when the worker boots (avoids import cycles).
-    imports=("app.pipeline.tasks",),
+    imports=("services.pipeline",),
 )

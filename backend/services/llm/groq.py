@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from ..config import get_settings
+from core.config import get_settings
+
 from .openai_compat import chat_complete
 
 _URL = "https://api.groq.com/openai/v1/chat/completions"

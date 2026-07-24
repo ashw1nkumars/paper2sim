@@ -1,6 +1,6 @@
 """Code extraction must tolerate plain, unclosed, and unfenced LLM responses."""
 
-from app.pipeline.tasks import extract_code
+from helpers.parsing import extract_code
 
 
 def test_plain_fenced_block():

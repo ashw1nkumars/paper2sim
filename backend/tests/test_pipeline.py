@@ -2,10 +2,10 @@
 
 from pathlib import Path
 
-from app import store as store_mod
-from app.config import get_settings
-from app.pipeline import tasks
-from app.schemas import JobRecord, JobStatus
+import store as store_mod
+from core.config import get_settings
+from models.job import JobRecord, JobStatus
+from services import pipeline as tasks
 
 
 def test_pipeline_end_to_end_with_mock(monkeypatch):

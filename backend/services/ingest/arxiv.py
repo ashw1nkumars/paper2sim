@@ -12,7 +12,7 @@ from xml.etree import ElementTree as ET
 
 import httpx
 
-from .. import store
+import store
 
 _ARXIV_API = "https://export.arxiv.org/api/query"
 _ATOM = {"a": "http://www.w3.org/2005/Atom"}

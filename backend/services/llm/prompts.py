@@ -6,7 +6,7 @@ harmless context; the deterministic MockProvider uses it to pick a canned reply.
 
 from __future__ import annotations
 
-from ..schemas import Analysis, ExecutionResult
+from models.job import Analysis, ExecutionResult
 
 # --- Analyze ---------------------------------------------------------------
 ANALYZE_SYSTEM = """TASK: analyze

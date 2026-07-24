@@ -8,8 +8,8 @@ from datetime import UTC, datetime
 
 import redis
 
-from .config import get_settings
-from .schemas import JobRecord, JobStatus
+from core.config import get_settings
+from models.job import JobRecord, JobStatus
 
 _settings = get_settings()
 _r = redis.Redis.from_url(_settings.redis_url, decode_responses=True)

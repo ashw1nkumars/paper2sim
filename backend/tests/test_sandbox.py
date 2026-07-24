@@ -1,6 +1,6 @@
 """The sandbox must run well-behaved code and contain misbehaving code."""
 
-from app.sandbox import executor, run_code
+from services.sandbox import executor, run_code
 
 _VALID = """
 import matplotlib

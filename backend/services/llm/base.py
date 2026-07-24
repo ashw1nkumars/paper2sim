@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from ..config import get_settings
+from core.config import get_settings
 
 
 class LLMProvider(Protocol):

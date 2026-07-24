@@ -2,7 +2,7 @@
 
 import pytest
 
-from app.ingest import arxiv
+from services.ingest import arxiv
 
 
 @pytest.mark.parametrize(

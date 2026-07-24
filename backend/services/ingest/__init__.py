@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from ..config import get_settings
-from ..schemas import JobRecord
+from core.config import get_settings
+from models.job import JobRecord
+
 from . import arxiv, pdf
 
 _settings = get_settings()

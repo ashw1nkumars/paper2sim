@@ -22,8 +22,8 @@ import sys
 import time
 from pathlib import Path
 
-from ..config import get_settings
-from ..schemas import ExecutionResult
+from core.config import get_settings
+from models.job import ExecutionResult
 
 _settings = get_settings()
 

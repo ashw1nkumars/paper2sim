@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from ..config import get_settings
+from core.config import get_settings
+
 from .openai_compat import chat_complete
 
 _URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
